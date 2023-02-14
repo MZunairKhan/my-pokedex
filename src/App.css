@@ -11,3 +11,10 @@
   background-color: #ef5350;
   justify-content: space-between;
 }
+
+.pokemon-list {
+  height: 300px;
+  width: 200px;
+  overflow: auto;
+  margin: 40px auto 0px auto;
+}
