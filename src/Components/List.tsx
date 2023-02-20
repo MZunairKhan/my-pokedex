@@ -9,6 +9,7 @@ import CONSTANTS from '../App.Constants';
 function List() {
   const navigate = useNavigate();
 
+  const [listType, setListType] = useState('Normal');
   const [PokemonArray, setPokemonArray] = useState([]);
 
   useEffect(() => {
@@ -45,9 +46,16 @@ function List() {
     if (bottom) { getPokemon() }
   }
 
+  const switchList = () => {
+    setListType(listType === 'Normal' ? 'Favorite' : 'Normal');
+    const list = StorageService.getData(listType === 'Normal' ? CONSTANTS.STORAGE.FAVORITE_LIST : CONSTANTS.STORAGE.NORMAL_LIST);
+    setPokemonArray(list);
+  }
+
   return (
     <div>
       <h2>Pokemon List</h2>
+      <button onClick={switchList}>View {listType === 'Normal' ? 'Favorite' : 'Full'} List</button>
       <div className="pokemon-list" onScroll={handleScroll}>
         {
           PokemonArray?.map((result: PokemonListItem) =>

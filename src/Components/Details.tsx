@@ -3,6 +3,8 @@ import '../App.css'
 import { useNavigate, useParams } from 'react-router-dom';
 import PokeApiService from '../Services/PokeApi-service';
 import StorageService from '../Services/Storage-service';
+import PokemonListItem from '../Models/PokemonListItem';
+import CONSTANTS from '../App.Constants';
 
 function Details() {
   const navigate = useNavigate();
@@ -11,6 +13,7 @@ function Details() {
 
   const [loaded, setLoaded] = useState(false);
   const [details, setDetails] = useState({} as any);
+  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     setLoaded(false);
@@ -21,6 +24,9 @@ function Details() {
     } else {
       getDetails();
     }
+
+    const index = checkIsFavorite();
+    setIsFavorite(index > -1);
   }, []);
 
   const getDetails = () => {
@@ -42,6 +48,28 @@ function Details() {
     navigate(`/`);
   }
 
+  const addToFavorite = () => {
+    const favorites: PokemonListItem[] = StorageService.getData(CONSTANTS.STORAGE.FAVORITE_LIST) || [];
+    const index = checkIsFavorite();
+
+    if (index > -1) {
+      favorites.splice(index as number, 1);
+      setIsFavorite(false);
+    } else {
+      const data: PokemonListItem = { name: name as string, url: `${CONSTANTS.BASE_URL}/${name}/` };
+      favorites.push(data);
+      setIsFavorite(true);
+    }
+
+    StorageService.addData(CONSTANTS.STORAGE.FAVORITE_LIST, favorites);
+  }
+
+  const checkIsFavorite = () => {
+    const favorites: PokemonListItem[] = StorageService.getData(CONSTANTS.STORAGE.FAVORITE_LIST) || [];
+    const index = favorites.findIndex(favorite => favorite.name === name as string);
+    return index;
+  }
+
   return (
     <div className="pokemon-details">
 
@@ -50,6 +78,9 @@ function Details() {
         <h2>Pokemon Details</h2>
       </div>
 
+      <div>
+        <button onClick={addToFavorite}>{isFavorite ? 'Remove From Favorites' : 'Add To Favorites'}</button>
+      </div>
       {
         loaded
         ?
