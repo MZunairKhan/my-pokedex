@@ -9,6 +9,7 @@ import CONSTANTS from '../App.Constants';
 function List() {
   const navigate = useNavigate();
 
+  const [error, setError] = useState('');
   const [listType, setListType] = useState('Normal');
   const [PokemonArray, setPokemonArray] = useState([]);
 
@@ -22,9 +23,11 @@ function List() {
   }, []);
 
   const getPokemon = () => {
+    const connectionTimerId = checkConnection();
     const offset = StorageService.getData(CONSTANTS.STORAGE.OFFSET);
     PokeApiService.getPokemon(offset)
     .then(async (response: any) => {
+      window.clearTimeout( connectionTimerId );
       const parsedResponse = await response.json();
       updateData(parsedResponse.results);
     })
@@ -46,6 +49,12 @@ function List() {
     if (bottom) { getPokemon() }
   }
 
+  const checkConnection = () => {
+    return window.setTimeout(() => {
+      setError("Internet connection seems to be slow");
+    }, 2000 );
+  }
+
   const switchList = () => {
     setListType(listType === 'Normal' ? 'Favorite' : 'Normal');
     const list = StorageService.getData(listType === 'Normal' ? CONSTANTS.STORAGE.FAVORITE_LIST : CONSTANTS.STORAGE.NORMAL_LIST);
@@ -63,6 +72,10 @@ function List() {
           )
         }
       </div>
+
+      {
+        error
+      }
     </div>
   );
 }

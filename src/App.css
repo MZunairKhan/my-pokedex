@@ -59,3 +59,8 @@ button {
   border-radius: 22px;
   border: 1px solid #ef5350;
 }
+
+li:hover {
+  color: blue;
+  cursor: pointer;
+}

@@ -11,6 +11,7 @@ function Details() {
 
   const { name } = useParams();
 
+  const [error, setError] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [details, setDetails] = useState({} as any);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -30,8 +31,10 @@ function Details() {
   }, []);
 
   const getDetails = () => {
+    const connectionTimerId = checkConnection();
     PokeApiService.getPokemonByName(name as string)
       .then(async (response: any) => {
+        window.clearTimeout( connectionTimerId );
         const parsedResponse = await response.json();
         updateState(parsedResponse);
         StorageService.addData(name as string, parsedResponse);
@@ -42,10 +45,17 @@ function Details() {
   const updateState = (data: any) => {
     setDetails(data);
     setLoaded(true);
+    setError('');
   }
 
   const routeToList = () => {
     navigate(`/`);
+  }
+
+  const checkConnection = () => {
+    return window.setTimeout(() => {
+      setError("Internet connection seems to be slow");
+    }, 2000 );
   }
 
   const addToFavorite = () => {
@@ -101,6 +111,10 @@ function Details() {
         </div>
         :
         <h2>Loading ...</h2>
+      }
+
+      {
+        error
       }
     </div>
   );
